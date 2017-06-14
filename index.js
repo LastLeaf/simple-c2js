@@ -1,21 +1,20 @@
 var fs = require('fs')
-var peg = require('pegjs')
-var generator = require('./generator')
+var generator = require('./lib/generator')
 
-var syntax = fs.readFileSync(__dirname + '/syntax.pegjs', {encoding: 'utf8'})
+var parser = null
 try {
-var parser = peg.generate(syntax)
-} catch(e) {console.info(e.location)}
-
-var PEGJS_OPTIONS = {
-  trace: true
+  parser = require('./bin/parser.js')
+} catch(e) {
+  var peg = require('pegjs')
+  var syntax = fs.readFileSync(__dirname + '/syntax.pegjs', {encoding: 'utf8'})
+  parser = peg.generate(syntax)
 }
 
 exports.parse = function(str){
-  return parser.parse(str, PEGJS_OPTIONS)
+  return parser.parse(str)
 }
 
 exports.compile = function(str){
-  var tree = parser.parse(str, PEGJS_OPTIONS)
+  var tree = parser.parse(str)
   return generator(tree)
 }

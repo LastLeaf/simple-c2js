@@ -6,14 +6,16 @@ var parseAndCompare = (source, target) => {
   try {
     res = c2js.parse(source)
   } catch(e) {
-    console.error(e)
+    console.error(e.message)
+    console.error(e.location)
+    throw e
   }
   expect(res).to.deep.equal(target)
 }
 
 describe('#parse', () => {
 
-  it('should parse macro and functions', () => {
+  it('should parse program overall structure', () => {
     var source = `
       #include <math.h>
       struct custom {
@@ -21,7 +23,7 @@ describe('#parse', () => {
         void* y_;
       };
       int calc(){}
-      int main( int a, char* _b ){
+      int main( struct custom* a, char* _b ){
         ;
       }
     `
@@ -51,16 +53,247 @@ describe('#parse', () => {
         type: 'int',
         name: 'main',
         args: [{
-          type: 'int',
+          type: 'struct custom*',
           name: 'a'
         }, {
           type: 'char*',
           name: '_b'
         }],
-        body: []
+        body: [{
+          op: '{}',
+          body: []
+        }]
       }]
     }
     parseAndCompare(source, target)
   })
+
+  it('should parse struct definitions', () => {
+    var source = `
+      struct A {
+        struct A* a;
+      };
+      struct B {
+        struct A* b;
+        unsigned int c;
+        double d;
+      };
+    `
+    var target = {
+      body: [{
+        op: 'struct',
+        name: 'A',
+        body: [{
+          type: 'struct A*',
+          name: 'a'
+        }]
+      }, {
+        op: 'struct',
+        name: 'B',
+        body: [{
+          type: 'struct A*',
+          name: 'b'
+        }, {
+          type: 'unsigned int',
+          name: 'c'
+        }, {
+          type: 'double',
+          name: 'd'
+        }]
+      }]
+    }
+    parseAndCompare(source, target)
+  })
+
+  it('should parse function definitions', () => {
+    var source = `
+      void* a() {}
+      struct S* b ( char* c ) { }
+      double d ( unsigned int e, int f, char* g ) {;}
+    `
+    var target = {
+      body: [{
+        op: 'function',
+        type: 'void*',
+        name: 'a',
+        args: [],
+        body: []
+      }, {
+        op: 'function',
+        type: 'struct S*',
+        name: 'b',
+        args: [{
+          type: 'char*',
+          name: 'c'
+        }],
+        body: []
+      }, {
+        op: 'function',
+        type: 'double',
+        name: 'd',
+        args: [{
+          type: 'unsigned int',
+          name: 'e'
+        }, {
+          type: 'int',
+          name: 'f'
+        }, {
+          type: 'char*',
+          name: 'g'
+        }],
+        body: [{
+          op: '{}',
+          body: []
+        }]
+      }]
+    }
+    parseAndCompare(source, target)
+  })
+
+  it('should parse common statements', () => {
+    var source = `
+      int main() {
+        struct A* a = 0;
+        if(1);
+        if (2) 3; else if(4) {
+          5;
+        } else {
+          6;
+        }
+        while(7)while ( 8 ) { 9; }
+        for(;;)for ( 11 ; 12 ; 13 ) {
+          14;
+          break;
+          continue ;
+        }
+        ;
+        return a;
+      }
+    `
+    var target = {
+      body: [{
+        op: 'function',
+        type: 'int',
+        name: 'main',
+        args: [],
+        body: [{
+          op: 'def',
+          type: 'struct A*',
+          body: [{
+            name: 'a',
+            value: {
+              op: 'int',
+              value: 0,
+            }
+          }]
+        }, {
+          op: 'if',
+          cond: {
+            op: 'int',
+            value: 1,
+          },
+          body: {
+            op: '{}',
+            body: []
+          },
+          elseBody: null
+        }, {
+          op: 'if',
+          cond: {
+            op: 'int',
+            value: 2,
+          },
+          body: {
+            op: 'int',
+            value: 3,
+          },
+          elseBody: {
+            op: 'if',
+            cond: {
+              op: 'int',
+              value: 4
+            },
+            body: {
+              op: '{}',
+              body: [{
+                op: 'int',
+                value: 5
+              }]
+            },
+            elseBody: {
+              op: '{}',
+              body: [{
+                op: 'int',
+                value: 6
+              }]
+            }
+          }
+        }, {
+          op: 'while',
+          cond: {
+            op: 'int',
+            value: 7,
+          },
+          body: {
+            op: 'while',
+            cond: {
+              op: 'int',
+              value: 8,
+            },
+            body: {
+              op: '{}',
+              body: [{
+                op: 'int',
+                value: 9,
+              }]
+            }
+          }
+        }, {
+          op: 'for',
+          init: null,
+          cond: null,
+          step: null,
+          body: {
+            op: 'for',
+            init: {
+              op: 'int',
+              value: 11,
+            },
+            cond: {
+              op: 'int',
+              value: 12,
+            },
+            step: {
+              op: 'int',
+              value: 13,
+            },
+            body: {
+              op: '{}',
+              body: [{
+                op: 'int',
+                value: 14,
+              }, {
+                op: 'break'
+              }, {
+                op: 'continue'
+              }]
+            }
+          }
+        }, {
+          op: '{}',
+          body: []
+        }, {
+          op: 'return',
+          body: {
+            op: 'var',
+            name: 'a'
+          }
+        }]
+      }]
+    }
+    parseAndCompare(source, target)
+  })
+
+  it('should parse ', () => {})
 
 })

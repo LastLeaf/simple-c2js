@@ -12,8 +12,7 @@ commentBlockBody
   / . commentBlockBody
 
 ws
-  = [ \t\r\n]+ { return '' }
-  / comment { return '' }
+  = ([ \t\r\n]+ / comment)+ { return '' }
 
 linewrap
   = '\r\n' / '\n' / '\r'
@@ -23,7 +22,11 @@ varName
 
 typeName
   = 'unsigned int' / 'int' / 'double' / 'float' / 'char*' / 'void*'
-  / 'struct' ws name:varName '*' { return name }
+  / 'struct' ws name:varName '*' { return 'struct ' + name + '*' }
+
+sizeofTypeName
+  = 'unsigned int' / 'int' / 'double' / 'float' / 'char'
+  / 'struct' ws name:varName { return 'struct ' + name }
 
 // program
 
@@ -76,23 +79,26 @@ argListNext
   = ws? ',' ws? typeName:typeName ws argName:varName args:argListNext { return args.unshift({ type: typeName, name: argName }), args }
   / '' { return [] }
 
-sentences
-  = ws? sentence:sentence ws? next:sentences { return sentence && next.unshift(sentence), next }
-  / '' { return [] }
-
 // sentence
 
-sentence
-  = ws? ';' { return null }
-  / body:breakStatement ws? ';' { return body }
+sentences
+  = ws? item:block ws? next:sentences { return item && next.unshift(item), next }
+  / ws? { return [] }
+
+block
+  = ws? ';' { return { op: '{}', body: [] } }
+  / statement
+  / body:commaExpression ws? ';' { return body }
+  / ws? '{' body:sentences ws? '}' { return { op: '{}', body: body } }
+
+statement
+  = body:breakStatement ws? ';' { return body }
   / body:continueStatement ws? ';' { return body }
   / body:returnStatement ws? ';' { return body }
   / ifStatement
   / whileStatement
   / forStatement
   / body:definition ws? ';' { return body }
-  / body:commaExpression ws? ';' { return body }
-  / body:constStatement ';' { return body }
 
 definition
   = ws? typeName:typeName ws item:defItem next:defListNext { return next.unshift(item), { op: 'def', type: typeName, body: next } }
@@ -104,39 +110,32 @@ defListNext
 defItem
   = ws? varName:varName ws? '=' ws? exp:expression { return { name: varName, value: exp } }
 
-constStatement
-  = ws? varName:varName ws? '=' ws? value:literal { return { op: 'const', name: varName, value: literal } }
-
 returnStatement
   = ws? 'return' body:commaExpression { return { op: 'return', body: body } }
 
 ifStatement
-  = ws? 'if' ws? '(' cond:commaExpression 'ws?' ')' ws? body:block elseBody:elseStatement { return { op: 'if', cond: cond, body: body, elseBody: elseBody } }
+  = ws? 'if' ws? '(' cond:commaExpression ws? ')' ws? body:block elseBody:elseStatement? { return { op: 'if', cond: cond, body: body, elseBody: elseBody } }
 
 elseStatement
   = ws? 'else' ws? body:block { return body }
 
 whileStatement
-  = ws? 'while' ws? '(' cond:commaExpression ')' ws? body:block { return { op: 'while', cond: cond, body: body } }
+  = ws? 'while' ws? '(' cond:commaExpression ws? ')' ws? body:block { return { op: 'while', cond: cond, body: body } }
 
 forStatement
-  = ws? 'for' ws? '(' init:commaExpression ';' cond:commaExpression ';' step:commaExpression ')' body:block { return { op: 'for', init: init, cond: cond, step: step, body: body } }
+  = ws? 'for' ws? '(' init:commaExpression? ws? ';' cond:commaExpression? ws? ';' step:commaExpression? ws? ')' body:block { return { op: 'for', init: init, cond: cond, step: step, body: body } }
 
 breakStatement
-  = ws? 'break'
+  = ws? 'break' { return { op: 'break' } }
 
 continueStatement
-  = ws? 'continue'
-
-block
-  = commaExpression
-  / ws? '{' body:sentences ws? '}' { return { op: '{}', body: body } }
+  = ws? 'continue' { return { op: 'continue' } }
 
 commaExpression
-  = item:expression next:commaExpressionNext { return next.unshift(item), { op: ',', body: next } }
+  = item:expression next:commaExpressionNext { return next.length ? next.unshift(item) && { op: ',', body: next } : item }
 
 commaExpressionNext
-  = ws? ',' item:expression next:commaExpressionNext { return next.unshift(item), next }
+  = ws? ',' item:expression next:commaExpressionNext { return next.unshift(item), next  }
   / '' { return [] }
 
 // expression
@@ -153,24 +152,39 @@ conditionExp
   / cond:logicOrExp ws? '?' body:expression ws? ':' elseBody:expression { return { op: '?:', cond: cond, body: body, elseBody: elseBody } }
 
 logicOrExp
-  = logicAndExp
-  / left:logicAndExp ws? '||' right:logicAndExp { return { op: '||', left: left, right: right } }
+  = item:logicAndExp next:logicOrExpNext { return next.length ? next.unshift(item) && { op: '||', body: next } : item }
+
+logicOrExpNext
+  = '||' item:logicAndExp next:logicOrExpNext { return next.unshift(item), next }
+  / '' { return [] }
 
 logicAndExp
-  = bitOrExp
-  / left:bitOrExp ws? '&&' right:bitOrExp { return { op: '&&', left: left, right: right } }
+  = item:bitOrExp next:logicAndExpNext { return next.length ? next.unshift(item) && { op: '&&', body: next } : item }
+
+logicAndExpNext
+  = '&&' item:bitOrExp next:logicAndExpNext { return next.unshift(item), next }
+  / '' { return [] }
 
 bitOrExp
-  = bitXorExp
-  / left:bitXorExp ws? '|' right:bitXorExp { return { op: '|', left: left, right: right } }
+  = item:bitXorExp next:bitOrExpNext { return next.length ? next.unshift(item) && { op: '|', body: next } : item }
+
+bitOrExpNext
+  = '|' item:bitXorExp next:bitOrExpNext { return next.unshift(item), next }
+  / '' { return [] }
 
 bitXorExp
-  = bitAndExp
-  / left:bitAndExp ws? '^' right:bitAndExp { return { op: '^', left: left, right: right } }
+  = item:bitAndExp next:bitXorExpNext { return next.length ? next.unshift(item) && { op: '^', body: next } : item }
+
+bitXorExpNext
+  = '^' item:bitAndExp next:bitXorExpNext { return next.unshift(item), next }
+  / '' { return [] }
 
 bitAndExp
-  = equalityExp
-  / left:equalityExp ws? '&' right:equalityExp { return { op: '&', left: left, right: right } }
+  = item:equalityExp next:bitAndExpNext { return next.length ? next.unshift(item) && { op: '&', body: next } : item }
+
+bitAndExpNext
+  = '&' item:equalityExp next:bitAndExpNext { return next.unshift(item), next }
+  / '' { return [] }
 
 equalityExp
   = relationalExp
@@ -182,24 +196,29 @@ relationalExp
 
 shiftExp
   = addition
-  / left:addition ws? '<<' right:addition { return { op: '<<', left: left, right: right } }
-  / left:addition ws? '>>' right:addition { return { op: '>>', left: left, right: right } }
+  / left:addition ws? op:( '<<' / '>>' ) right:addition { return { op: op, left: left, right: right } }
 
 addition
-  = multiplication
-  / left:multiplication op:[+-] right:multiplication { return { op: op, left: left, right: right } }
+  = item:multiplication next:additionNext { return next.length ? next.unshift(item) && { op: '+-', body: next } : item }
+
+additionNext
+  = op:[-+] item:multiplication next:additionNext { return next.unshift({ op: op, body: item }), next }
+  / '' { return [] }
 
 multiplication
-  = unaryExp
-  / left:unaryExp op:[*/%] right:unaryExp { return { op: op, left: left, right: right } }
+  = item:unaryExp next:multiplicationNext { return next.length ? next.unshift(item) && { op: '*/%', body: next } : item }
+
+multiplicationNext
+  = op:[*/%] item:unaryExp next:multiplicationNext { return next.unshift({ op: op, body: item }), next }
+  / '' { return [] }
 
 unaryExp
   = memberExp
-  / ws? '+' body:memberExp
-  / ws? '-' body:memberExp
-  / ws? '!' body:memberExp
-  / ws? '~' body:memberExp
-  / ws? '(' type:typeName ')' body:memberExp
+  / ws? '+' body:unaryExp { return { op: '+n', body: body } }
+  / ws? '-' body:unaryExp { return { op: '-n', body: body } }
+  / ws? '!' body:unaryExp { return { op: '!n', body: body } }
+  / ws? '~' body:unaryExp { return { op: '~n', body: body } }
+  / ws? '(' type:typeName ')' body:unaryExp { return { op: 'cast', type: type, body: body } }
 
 memberExp
   = callExp
@@ -207,12 +226,12 @@ memberExp
 
 callExp
   = brackets
-  / name:varName '(' body:commaExpression ')' { return { op: 'f()', args: body.body } }
+  / ws? name:varName ws? '(' body:commaExpression ws? ')' { return { op: 'f()', args: body.body } }
 
 brackets
-  = ws? literal
-  / ws? varName { return { op: 'var', body: body } }
-  / ws? 'sizeof(' ws? type:typeName ws? ')' { return { op: 'sizeof', type: type } }
+  = ws? body:literal { return body }
+  / ws? name:varName { return { op: 'var', name: name } }
+  / ws? 'sizeof(' ws? type:sizeofTypeName ws? ')' { return { op: 'sizeof', type: type } }
   / ws? '(' body:expression ws? ')' { return { op: '()', body: body } }
 
 // lvalue
@@ -238,14 +257,14 @@ literal
   / float
 
 integer
-  = first:[1-9] next:[0-9]* { return parseInt(first + next.join(''), 10) }
+  = first:[1-9] next:[0-9]* { return parseInt(String(first) + next.join(''), 10) }
   / '0x' next:[0-9]+ { return parseInt(next.join(''), 16) }
-  / '0' next:[0-9]+ { return parseInt(next.join(''), 8) }
+  / '0' next:[0-9]* { return next.length ? parseInt(next.join(''), 8) : 0 }
 
 float
   = first:[0-9]* '.' next:[0-9]+ type:[l]i? {
     return {
       op: (type === 'l' || type === 'L' ? 'double' : 'float'),
-      num: parseFloat(first.join('') + '.' + next.join(''))
+      value: parseFloat(first.join('') + '.' + next.join(''))
     }
   }

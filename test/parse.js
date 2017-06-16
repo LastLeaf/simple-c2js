@@ -294,6 +294,17 @@ describe('#parse', () => {
     parseAndCompare(source, target)
   })
 
-  it('should parse ', () => {})
+  it('should parse common expressions', () => {
+    var source = `
+      int main() {
+        a == +1 % 0 - 2u / 0;
+        b[3].child->point = 4.0 * -5.7L;
+        (aaa) && a | f(b1, b2) & (~~c ^ !d);
+        m ? n != p || q > s && t <= x : y << z;
+      }
+    `
+    var target = {}
+    parseAndCompare(source, target)
+  })
 
 })

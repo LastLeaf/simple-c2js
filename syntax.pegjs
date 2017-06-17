@@ -243,9 +243,8 @@ memberOp
   = ws? item:varName next:memberOpNext { return next.length ? next.unshift(item) && { op: 'member', body: next } : item }
 
 memberOpNext
-  = ws? op:('.' / '->') body:varName next:memberOpNext { return next.unshift({ op: op, body: body }), next }
-  / ws? '[' body:expression ']' next:memberOpNext { return next.unshift({ op: '[]', body: body }), next }
-  / '' { return [] }
+  = ws? op:('.' / '->') body:varName next:(memberOpNext / '') { return next = next || [], next.unshift({ op: op, body: body }), next }
+  / ws? '[' body:expression ']' next:(memberOpNext / '') { return next = next || [], next.unshift({ op: '[]', body: body }), next }
 
 // const
 

@@ -303,7 +303,236 @@ describe('#parse', () => {
         m ? n != p || q > s && t <= x : y << z;
       }
     `
-    var target = {}
+    var target ={
+      "body": [
+        {
+          "op": "function",
+          "type": "int",
+          "name": "main",
+          "args": [],
+          "body": [
+            {
+              "op": "==",
+              "left": {
+                "op": "var",
+                "name": "a"
+              },
+              "right": {
+                "op": "+-",
+                "body": [
+                  {
+                    "op": "*/%",
+                    "body": [
+                      {
+                        "op": "+n",
+                        "body": {
+                          "op": "int",
+                          "value": 1
+                        }
+                      },
+                      {
+                        "op": "%",
+                        "body": {
+                          "op": "int",
+                          "value": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "op": "-",
+                    "body": {
+                      "op": "*/%",
+                      "body": [
+                        {
+                          "op": "unsigned int",
+                          "value": 2
+                        },
+                        {
+                          "op": "/",
+                          "body": {
+                            "op": "int",
+                            "value": 0
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "op": "=",
+              "left": {
+                "op": "member",
+                "body": [
+                  "b",
+                  {
+                    "op": "[]",
+                    "body": {
+                      "op": "int",
+                      "value": 3
+                    }
+                  },
+                  {
+                    "op": ".",
+                    "body": "child"
+                  },
+                  {
+                    "op": "->",
+                    "body": "point"
+                  }
+                ]
+              },
+              "right": {
+                "op": "*/%",
+                "body": [
+                  {
+                    "op": "float",
+                    "value": 4
+                  },
+                  {
+                    "op": "*",
+                    "body": {
+                      "op": "-n",
+                      "body": {
+                        "op": "double",
+                        "value": 5.7
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "op": "&&",
+              "body": [
+                {
+                  "op": "()",
+                  "body": {
+                    "op": "var",
+                    "name": "aaa"
+                  }
+                },
+                {
+                  "op": "|",
+                  "body": [
+                    {
+                      "op": "var",
+                      "name": "a"
+                    },
+                    {
+                      "op": "&",
+                      "body": [
+                        {
+                          "op": "f()",
+                          "args": [
+                            {
+                              "op": "var",
+                              "name": "b1"
+                            },
+                            {
+                              "op": "var",
+                              "name": "b2"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "()",
+                          "body": {
+                            "op": "^",
+                            "body": [
+                              {
+                                "op": "~n",
+                                "body": {
+                                  "op": "~n",
+                                  "body": {
+                                    "op": "var",
+                                    "name": "c"
+                                  }
+                                }
+                              },
+                              {
+                                "op": "!n",
+                                "body": {
+                                  "op": "var",
+                                  "name": "d"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "?:",
+              "cond": {
+                "op": "var",
+                "name": "m"
+              },
+              "body": {
+                "op": "||",
+                "body": [
+                  {
+                    "op": "!=",
+                    "left": {
+                      "op": "var",
+                      "name": "n"
+                    },
+                    "right": {
+                      "op": "var",
+                      "name": "p"
+                    }
+                  },
+                  {
+                    "op": "&&",
+                    "body": [
+                      {
+                        "op": ">null",
+                        "left": {
+                          "op": "var",
+                          "name": "q"
+                        },
+                        "right": {
+                          "op": "var",
+                          "name": "s"
+                        }
+                      },
+                      {
+                        "op": "<=",
+                        "left": {
+                          "op": "var",
+                          "name": "t"
+                        },
+                        "right": {
+                          "op": "var",
+                          "name": "x"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "elseBody": {
+                "op": "<<",
+                "left": {
+                  "op": "var",
+                  "name": "y"
+                },
+                "right": {
+                  "op": "var",
+                  "name": "z"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
     parseAndCompare(source, target)
   })
 

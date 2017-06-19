@@ -1,7 +1,8 @@
 var fs = require('fs')
 var parseFile = require('./lib/parse-file')
 var convert = require('./lib/convert')
-var generator = require('./lib/generate')
+var generate = require('./lib/generate')
+var link = require('./lib/link')
 
 var PEGJS_OPTIONS = {
   cache: false,
@@ -26,5 +27,5 @@ exports.parseFile = function(filename){
 }
 
 exports.compile = function(filename){
-  return generator(convert(parseFile(parser, filename)))
+  return link(generate(convert(parseFile(parser, filename))))
 }

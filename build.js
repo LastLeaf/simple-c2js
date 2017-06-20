@@ -10,7 +10,7 @@ var PEGJS_OPTIONS = {
 
 console.log('Generating parser using PEG.js...')
 
-var syntax = fs.readFileSync(__dirname + '/syntax.pegjs', {encoding: 'utf8'})
+var syntax = fs.readFileSync(__dirname + '/lib/syntax.pegjs', {encoding: 'utf8'})
 var parserStr = peg.generate(syntax, PEGJS_OPTIONS)
 fs.writeFile(__dirname + '/bin/parser.js', parserStr)
 

@@ -14,7 +14,7 @@ try {
   parser = require('./bin/parser.js')
 } catch(e) {
   var peg = require('pegjs')
-  var syntax = fs.readFileSync(__dirname + '/syntax.pegjs', {encoding: 'utf8'})
+  var syntax = fs.readFileSync(__dirname + '/lib/syntax.pegjs', {encoding: 'utf8'})
   parser = peg.generate(syntax, PEGJS_OPTIONS)
 }
 
@@ -27,5 +27,9 @@ exports.parseFile = function(filename){
 }
 
 exports.compile = function(filename){
-  return link(generate(convert(parseFile(parser, filename))))
+  return generate(convert(parseFile(parser, filename)))
+}
+
+exports.link = function(str){
+  return link(str)
 }

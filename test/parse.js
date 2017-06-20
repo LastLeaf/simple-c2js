@@ -1,6 +1,14 @@
 var c2js = require('../index')
 var expect = require('chai').expect
 
+var removeLocationFields = (obj) => {
+  for(var k in obj) {
+    if(k === 'location') delete obj[k]
+    if(typeof(obj[k]) === 'object') removeLocationFields(obj[k])
+  }
+  return obj
+}
+
 var parseAndCompare = (source, target) => {
   var res = null
   try {
@@ -10,7 +18,8 @@ var parseAndCompare = (source, target) => {
     console.error(e.location)
     throw e
   }
-  expect(res).to.deep.equal(target)
+  // console.info(JSON.stringify(res, null, '  '))
+  expect(removeLocationFields(res)).to.deep.equal(target)
 }
 
 describe('#parse', () => {
@@ -22,48 +31,103 @@ describe('#parse', () => {
         int x1;
         void* y_;
       };
+      static struct custom* a = 0xA;
       int calc(){}
       int main( struct custom* a, char* _b ){
         ;
       }
     `
     var target = {
-      body: [{
-        op: 'macro',
-        name: 'include',
-        body: '<math.h>'
-      }, {
-        op: 'struct',
-        name: 'custom',
-        body: [{
-          type: 'int',
-          name: 'x1'
-        }, {
-          type: 'void*',
-          name: 'y_'
-        }]
-      }, {
-        op: 'function',
-        type: 'int',
-        name: 'calc',
-        args: [],
-        body: []
-      }, {
-        op: 'function',
-        type: 'int',
-        name: 'main',
-        args: [{
-          type: 'struct custom*',
-          name: 'a'
-        }, {
-          type: 'char*',
-          name: '_b'
-        }],
-        body: [{
-          op: '{}',
-          body: []
-        }]
-      }]
+      "body": [
+        {
+          "op": "macro",
+          "name": "include",
+          "body": "<math.h>"
+        },
+        {
+          "op": "struct",
+          "name": "custom",
+          "body": [
+            {
+              "type": {
+                "struct": false,
+                "name": "int",
+                "pointer": 0
+              },
+              "name": "x1"
+            },
+            {
+              "type": {
+                "struct": false,
+                "name": "void",
+                "pointer": 1
+              },
+              "name": "y_"
+            }
+          ]
+        },
+        {
+          "body": [
+            {
+              "name": "a",
+              "value": {
+                "op": "int",
+                "value": 10
+              }
+            }
+          ],
+          "op": "static",
+          "type": {
+            "name": "custom",
+            "pointer": 1,
+            "struct": true
+          }
+        },
+        {
+          "op": "function",
+          "type": {
+            "struct": false,
+            "name": "int",
+            "pointer": 0
+          },
+          "name": "calc",
+          "args": [],
+          "body": []
+        },
+        {
+          "op": "function",
+          "type": {
+            "struct": false,
+            "name": "int",
+            "pointer": 0
+          },
+          "name": "main",
+          "args": [
+            {
+              "type": {
+                "struct": true,
+                "name": "custom",
+                "pointer": 1
+              },
+              "name": "a"
+            },
+            {
+              "type": {
+                "struct": false,
+                "name": "char",
+                "pointer": 1
+              },
+              "name": "_b"
+            }
+          ],
+          "body": [
+            {
+              "op": "{}",
+              "body": []
+            }
+          ]
+        }
+      ]
     }
     parseAndCompare(source, target)
   })
@@ -75,32 +139,57 @@ describe('#parse', () => {
       };
       struct B {
         struct A* b;
-        unsigned int c;
+        int c;
         double d;
       };
     `
     var target = {
-      body: [{
-        op: 'struct',
-        name: 'A',
-        body: [{
-          type: 'struct A*',
-          name: 'a'
-        }]
-      }, {
-        op: 'struct',
-        name: 'B',
-        body: [{
-          type: 'struct A*',
-          name: 'b'
-        }, {
-          type: 'unsigned int',
-          name: 'c'
-        }, {
-          type: 'double',
-          name: 'd'
-        }]
-      }]
+      "body": [
+        {
+          "op": "struct",
+          "name": "A",
+          "body": [
+            {
+              "type": {
+                "struct": true,
+                "name": "A",
+                "pointer": 1
+              },
+              "name": "a"
+            }
+          ]
+        },
+        {
+          "op": "struct",
+          "name": "B",
+          "body": [
+            {
+              "type": {
+                "struct": true,
+                "name": "A",
+                "pointer": 1
+              },
+              "name": "b"
+            },
+            {
+              "type": {
+                "struct": false,
+                "name": "int",
+                "pointer": 0
+              },
+              "name": "c"
+            },
+            {
+              "type": {
+                "struct": false,
+                "name": "double",
+                "pointer": 0
+              },
+              "name": "d"
+            }
+          ]
+        }
+      ]
     }
     parseAndCompare(source, target)
   })
@@ -109,43 +198,83 @@ describe('#parse', () => {
     var source = `
       void* a() {}
       struct S* b ( char* c ) { }
-      double d ( unsigned int e, int f, char* g ) {;}
+      double d ( int e, int f, char* g ) {;}
     `
     var target = {
-      body: [{
-        op: 'function',
-        type: 'void*',
-        name: 'a',
-        args: [],
-        body: []
-      }, {
-        op: 'function',
-        type: 'struct S*',
-        name: 'b',
-        args: [{
-          type: 'char*',
-          name: 'c'
-        }],
-        body: []
-      }, {
-        op: 'function',
-        type: 'double',
-        name: 'd',
-        args: [{
-          type: 'unsigned int',
-          name: 'e'
-        }, {
-          type: 'int',
-          name: 'f'
-        }, {
-          type: 'char*',
-          name: 'g'
-        }],
-        body: [{
-          op: '{}',
-          body: []
-        }]
-      }]
+      "body": [
+        {
+          "op": "function",
+          "type": {
+            "struct": false,
+            "name": "void",
+            "pointer": 1
+          },
+          "name": "a",
+          "args": [],
+          "body": []
+        },
+        {
+          "op": "function",
+          "type": {
+            "struct": true,
+            "name": "S",
+            "pointer": 1
+          },
+          "name": "b",
+          "args": [
+            {
+              "type": {
+                "struct": false,
+                "name": "char",
+                "pointer": 1
+              },
+              "name": "c"
+            }
+          ],
+          "body": []
+        },
+        {
+          "op": "function",
+          "type": {
+            "struct": false,
+            "name": "double",
+            "pointer": 0
+          },
+          "name": "d",
+          "args": [
+            {
+              "type": {
+                "struct": false,
+                "name": "int",
+                "pointer": 0
+              },
+              "name": "e"
+            },
+            {
+              "type": {
+                "struct": false,
+                "name": "int",
+                "pointer": 0
+              },
+              "name": "f"
+            },
+            {
+              "type": {
+                "struct": false,
+                "name": "char",
+                "pointer": 1
+              },
+              "name": "g"
+            }
+          ],
+          "body": [
+            {
+              "op": "{}",
+              "body": []
+            }
+          ]
+        }
+      ]
     }
     parseAndCompare(source, target)
   })
@@ -171,125 +300,155 @@ describe('#parse', () => {
       }
     `
     var target = {
-      body: [{
-        op: 'function',
-        type: 'int',
-        name: 'main',
-        args: [],
-        body: [{
-          op: 'def',
-          type: 'struct A*',
-          body: [{
-            name: 'a',
-            value: {
-              op: 'int',
-              value: 0,
+      "body": [
+        {
+          "op": "function",
+          "type": {
+            "struct": false,
+            "name": "int",
+            "pointer": 0
+          },
+          "name": "main",
+          "args": [],
+          "body": [
+            {
+              "op": "def",
+              "type": {
+                "struct": true,
+                "name": "A",
+                "pointer": 1
+              },
+              "body": [
+                {
+                  "name": "a",
+                  "value": {
+                    "op": "int",
+                    "value": 0
+                  }
+                }
+              ]
+            },
+            {
+              "op": "if",
+              "cond": {
+                "op": "int",
+                "value": 1
+              },
+              "body": {
+                "op": "{}",
+                "body": []
+              },
+              "elseBody": null
+            },
+            {
+              "op": "if",
+              "cond": {
+                "op": "int",
+                "value": 2
+              },
+              "body": {
+                "op": "int",
+                "value": 3
+              },
+              "elseBody": {
+                "op": "if",
+                "cond": {
+                  "op": "int",
+                  "value": 4
+                },
+                "body": {
+                  "op": "{}",
+                  "body": [
+                    {
+                      "op": "int",
+                      "value": 5
+                    }
+                  ]
+                },
+                "elseBody": {
+                  "op": "{}",
+                  "body": [
+                    {
+                      "op": "int",
+                      "value": 6
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "op": "while",
+              "cond": {
+                "op": "int",
+                "value": 7
+              },
+              "body": {
+                "op": "while",
+                "cond": {
+                  "op": "int",
+                  "value": 8
+                },
+                "body": {
+                  "op": "{}",
+                  "body": [
+                    {
+                      "op": "int",
+                      "value": 9
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "op": "for",
+              "init": null,
+              "cond": null,
+              "step": null,
+              "body": {
+                "op": "for",
+                "init": {
+                  "op": "int",
+                  "value": 11
+                },
+                "cond": {
+                  "op": "int",
+                  "value": 12
+                },
+                "step": {
+                  "op": "int",
+                  "value": 13
+                },
+                "body": {
+                  "op": "{}",
+                  "body": [
+                    {
+                      "op": "int",
+                      "value": 14
+                    },
+                    {
+                      "op": "break"
+                    },
+                    {
+                      "op": "continue"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "op": "{}",
+              "body": []
+            },
+            {
+              "op": "return",
+              "body": {
+                "op": "var",
+                "name": "a"
+              }
             }
-          }]
-        }, {
-          op: 'if',
-          cond: {
-            op: 'int',
-            value: 1,
-          },
-          body: {
-            op: '{}',
-            body: []
-          },
-          elseBody: null
-        }, {
-          op: 'if',
-          cond: {
-            op: 'int',
-            value: 2,
-          },
-          body: {
-            op: 'int',
-            value: 3,
-          },
-          elseBody: {
-            op: 'if',
-            cond: {
-              op: 'int',
-              value: 4
-            },
-            body: {
-              op: '{}',
-              body: [{
-                op: 'int',
-                value: 5
-              }]
-            },
-            elseBody: {
-              op: '{}',
-              body: [{
-                op: 'int',
-                value: 6
-              }]
-            }
-          }
-        }, {
-          op: 'while',
-          cond: {
-            op: 'int',
-            value: 7,
-          },
-          body: {
-            op: 'while',
-            cond: {
-              op: 'int',
-              value: 8,
-            },
-            body: {
-              op: '{}',
-              body: [{
-                op: 'int',
-                value: 9,
-              }]
-            }
-          }
-        }, {
-          op: 'for',
-          init: null,
-          cond: null,
-          step: null,
-          body: {
-            op: 'for',
-            init: {
-              op: 'int',
-              value: 11,
-            },
-            cond: {
-              op: 'int',
-              value: 12,
-            },
-            step: {
-              op: 'int',
-              value: 13,
-            },
-            body: {
-              op: '{}',
-              body: [{
-                op: 'int',
-                value: 14,
-              }, {
-                op: 'break'
-              }, {
-                op: 'continue'
-              }]
-            }
-          }
-        }, {
-          op: '{}',
-          body: []
-        }, {
-          op: 'return',
-          body: {
-            op: 'var',
-            name: 'a'
-          }
-        }]
-      }]
+          ]
+        }
+      ]
     }
     parseAndCompare(source, target)
   })
@@ -303,11 +462,15 @@ describe('#parse', () => {
         m ? n != p || q > s && t <= x : y << z;
       }
     `
-    var target ={
+    var target = {
       "body": [
         {
           "op": "function",
-          "type": "int",
+          "type": {
+            "struct": false,
+            "name": "int",
+            "pointer": 0
+          },
           "name": "main",
           "args": [],
           "body": [
@@ -345,7 +508,7 @@ describe('#parse', () => {
                       "op": "*/%",
                       "body": [
                         {
-                          "op": "unsigned int",
+                          "op": "int",
                           "value": 2
                         },
                         {

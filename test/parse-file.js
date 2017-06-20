@@ -1,6 +1,14 @@
 var c2js = require('../index')
 var expect = require('chai').expect
 
+var removeLocationFields = (obj) => {
+  for(var k in obj) {
+    if(k === 'location') delete obj[k]
+    if(typeof(obj[k]) === 'object') removeLocationFields(obj[k])
+  }
+  return obj
+}
+
 var parseAndCompare = (filename, target) => {
   var res = null
   try {
@@ -10,7 +18,7 @@ var parseAndCompare = (filename, target) => {
     console.error(e.location)
     throw e
   }
-  expect(res).to.deep.equal(target)
+  expect(removeLocationFields(res)).to.deep.equal(target)
 }
 
 describe('#parseFile', () => {
@@ -26,7 +34,11 @@ describe('#parseFile', () => {
         },
         {
           "op": "function",
-          "type": "int",
+          "type": {
+            "struct": false,
+            "name": "int",
+            "pointer": 0
+          },
           "name": "func4",
           "args": [],
           "body": []
@@ -38,7 +50,11 @@ describe('#parseFile', () => {
         },
         {
           "op": "function",
-          "type": "int",
+          "type": {
+            "struct": false,
+            "name": "int",
+            "pointer": 0
+          },
           "name": "func2",
           "args": [],
           "body": []
@@ -55,14 +71,22 @@ describe('#parseFile', () => {
         },
         {
           "op": "function",
-          "type": "int",
+          "type": {
+            "struct": false,
+            "name": "int",
+            "pointer": 0
+          },
           "name": "func3",
           "args": [],
           "body": []
         },
         {
           "op": "function",
-          "type": "int",
+          "type": {
+            "struct": false,
+            "name": "int",
+            "pointer": 0
+          },
           "name": "func1",
           "args": [],
           "body": []

@@ -34,6 +34,7 @@ describe('#parseFile', () => {
         },
         {
           "op": "function",
+          "static": false,
           "type": {
             "struct": false,
             "name": "int",
@@ -50,6 +51,7 @@ describe('#parseFile', () => {
         },
         {
           "op": "function",
+          "static": false,
           "type": {
             "struct": false,
             "name": "int",
@@ -71,6 +73,7 @@ describe('#parseFile', () => {
         },
         {
           "op": "function",
+          "static": false,
           "type": {
             "struct": false,
             "name": "int",
@@ -82,6 +85,7 @@ describe('#parseFile', () => {
         },
         {
           "op": "function",
+          "static": false,
           "type": {
             "struct": false,
             "name": "int",

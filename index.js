@@ -26,6 +26,10 @@ exports.parseFile = function(filename){
   return parseFile(parser, filename)
 }
 
+exports._compileContentOnly = function(filename){
+  return generate(convert(parseFile(parser, filename)), true)
+}
+
 exports.compile = function(filename){
   return generate(convert(parseFile(parser, filename)))
 }

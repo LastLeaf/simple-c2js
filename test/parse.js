@@ -32,7 +32,7 @@ describe('#parse', () => {
         void* y_;
       };
       static struct custom* a = 0xA;
-      int calc(){}
+      static int calc(){}
       int main( struct custom* a, char* _b ){
         ;
       }
@@ -85,6 +85,7 @@ describe('#parse', () => {
         },
         {
           "op": "function",
+          "static": true,
           "type": {
             "struct": false,
             "name": "int",
@@ -96,6 +97,7 @@ describe('#parse', () => {
         },
         {
           "op": "function",
+          "static": false,
           "type": {
             "struct": false,
             "name": "int",
@@ -204,6 +206,7 @@ describe('#parse', () => {
       "body": [
         {
           "op": "function",
+          "static": false,
           "type": {
             "struct": false,
             "name": "void",
@@ -215,6 +218,7 @@ describe('#parse', () => {
         },
         {
           "op": "function",
+          "static": false,
           "type": {
             "struct": true,
             "name": "S",
@@ -235,6 +239,7 @@ describe('#parse', () => {
         },
         {
           "op": "function",
+          "static": false,
           "type": {
             "struct": false,
             "name": "double",
@@ -303,6 +308,7 @@ describe('#parse', () => {
       "body": [
         {
           "op": "function",
+          "static": false,
           "type": {
             "struct": false,
             "name": "int",
@@ -466,6 +472,7 @@ describe('#parse', () => {
       "body": [
         {
           "op": "function",
+          "static": false,
           "type": {
             "struct": false,
             "name": "int",

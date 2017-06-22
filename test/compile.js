@@ -23,7 +23,13 @@ describe('#_compileContentOnly', () => {
 
   it('should compile empty functions', () => {
     var filename = __dirname + '/compile/function.c'
-    var target = 'function calc(){return (0)|0;}function fn(f,i){f=__f__(f);i=i|0;return +(0);}function main(argc,argv){argc=argc|0;argv=argv|0;return (0)|0;}return{fn:fn,main:main}'
+    var target = 'function calc(){return 0;}function fn(f,i){f=__f__(f);i=i|0;return +((0)|0);}function main(argc,argv){argc=argc|0;argv=argv|0;return 0;}return{fn:fn,main:main}'
+    expect(compileContent(filename)).to.equal(target)
+  })
+
+  it('should compile function variable definitions', () => {
+    var filename = __dirname + '/compile/definition.c'
+    var target = 'function main(){var a=4096,c=-1,d=0;return 8;}return{main:main}'
     expect(compileContent(filename)).to.equal(target)
   })
 

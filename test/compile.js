@@ -33,6 +33,24 @@ describe('#_compileContentOnly', () => {
     expect(compileContent(filename)).to.equal(target)
   })
 
+  it('should compile if statements', () => {
+    var filename = __dirname + '/compile/if.c'
+    var target = 'function main(){if(1)2;if(3){return 4;}else if(5){return 6;}else {return 7;}}return{main:main}'
+    expect(compileContent(filename)).to.equal(target)
+  })
+
+  it('should compile while statements', () => {
+    var filename = __dirname + '/compile/while.c'
+    var target = 'function main(){while(1)2;while(3){return 4;}}return{main:main}'
+    expect(compileContent(filename)).to.equal(target)
+  })
+
+  it('should compile for statements', () => {
+    var filename = __dirname + '/compile/for.c'
+    var target = 'function main(){for(;;){}for(1;2;3){return ~~floor(4);}}return{main:main}'
+    expect(compileContent(filename)).to.equal(target)
+  })
+
 })
 
 describe('#compile', () => {

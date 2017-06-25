@@ -37,6 +37,7 @@ describe('#parseFile', () => {
           "static": false,
           "type": {
             "struct": false,
+            "unsigned": false,
             "name": "int",
             "pointer": 0
           },
@@ -54,6 +55,7 @@ describe('#parseFile', () => {
           "static": false,
           "type": {
             "struct": false,
+            "unsigned": false,
             "name": "int",
             "pointer": 0
           },
@@ -76,6 +78,7 @@ describe('#parseFile', () => {
           "static": false,
           "type": {
             "struct": false,
+            "unsigned": false,
             "name": "int",
             "pointer": 0
           },
@@ -88,6 +91,7 @@ describe('#parseFile', () => {
           "static": false,
           "type": {
             "struct": false,
+            "unsigned": false,
             "name": "int",
             "pointer": 0
           },

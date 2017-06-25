@@ -32,8 +32,8 @@ describe('#parse', () => {
         void* y_;
       };
       static struct custom* a = 0xA;
-      static int calc(){}
-      int main( struct custom* a, char* _b ){
+      static unsigned int calc(){}
+      int main( struct custom* a, unsigned char* _b ){
         ;
       }
     `
@@ -51,6 +51,7 @@ describe('#parse', () => {
             {
               "type": {
                 "struct": false,
+                "unsigned": false,
                 "name": "int",
                 "pointer": 0
               },
@@ -59,6 +60,7 @@ describe('#parse', () => {
             {
               "type": {
                 "struct": false,
+                "unsigned": false,
                 "name": "void",
                 "pointer": 1
               },
@@ -80,7 +82,8 @@ describe('#parse', () => {
           "type": {
             "name": "custom",
             "pointer": 1,
-            "struct": true
+            "struct": true,
+            "unsigned": false
           }
         },
         {
@@ -88,6 +91,7 @@ describe('#parse', () => {
           "static": true,
           "type": {
             "struct": false,
+            "unsigned": true,
             "name": "int",
             "pointer": 0
           },
@@ -100,6 +104,7 @@ describe('#parse', () => {
           "static": false,
           "type": {
             "struct": false,
+            "unsigned": false,
             "name": "int",
             "pointer": 0
           },
@@ -108,6 +113,7 @@ describe('#parse', () => {
             {
               "type": {
                 "struct": true,
+                "unsigned": false,
                 "name": "custom",
                 "pointer": 1
               },
@@ -116,6 +122,7 @@ describe('#parse', () => {
             {
               "type": {
                 "struct": false,
+                "unsigned": true,
                 "name": "char",
                 "pointer": 1
               },
@@ -154,6 +161,7 @@ describe('#parse', () => {
             {
               "type": {
                 "struct": true,
+                "unsigned": false,
                 "name": "A",
                 "pointer": 1
               },
@@ -168,6 +176,7 @@ describe('#parse', () => {
             {
               "type": {
                 "struct": true,
+                "unsigned": false,
                 "name": "A",
                 "pointer": 1
               },
@@ -176,6 +185,7 @@ describe('#parse', () => {
             {
               "type": {
                 "struct": false,
+                "unsigned": false,
                 "name": "int",
                 "pointer": 0
               },
@@ -184,6 +194,7 @@ describe('#parse', () => {
             {
               "type": {
                 "struct": false,
+                "unsigned": false,
                 "name": "double",
                 "pointer": 0
               },
@@ -209,6 +220,7 @@ describe('#parse', () => {
           "static": false,
           "type": {
             "struct": false,
+            "unsigned": false,
             "name": "void",
             "pointer": 1
           },
@@ -221,6 +233,7 @@ describe('#parse', () => {
           "static": false,
           "type": {
             "struct": true,
+            "unsigned": false,
             "name": "S",
             "pointer": 1
           },
@@ -229,6 +242,7 @@ describe('#parse', () => {
             {
               "type": {
                 "struct": false,
+                "unsigned": false,
                 "name": "char",
                 "pointer": 1
               },
@@ -242,6 +256,7 @@ describe('#parse', () => {
           "static": false,
           "type": {
             "struct": false,
+            "unsigned": false,
             "name": "double",
             "pointer": 0
           },
@@ -250,6 +265,7 @@ describe('#parse', () => {
             {
               "type": {
                 "struct": false,
+                "unsigned": false,
                 "name": "int",
                 "pointer": 0
               },
@@ -258,6 +274,7 @@ describe('#parse', () => {
             {
               "type": {
                 "struct": false,
+                "unsigned": false,
                 "name": "int",
                 "pointer": 0
               },
@@ -266,6 +283,7 @@ describe('#parse', () => {
             {
               "type": {
                 "struct": false,
+                "unsigned": false,
                 "name": "char",
                 "pointer": 1
               },
@@ -311,6 +329,7 @@ describe('#parse', () => {
           "static": false,
           "type": {
             "struct": false,
+            "unsigned": false,
             "name": "int",
             "pointer": 0
           },
@@ -321,6 +340,7 @@ describe('#parse', () => {
               "op": "def",
               "type": {
                 "struct": true,
+                "unsigned": false,
                 "name": "A",
                 "pointer": 1
               },
@@ -475,6 +495,7 @@ describe('#parse', () => {
           "static": false,
           "type": {
             "struct": false,
+            "unsigned": false,
             "name": "int",
             "pointer": 0
           },

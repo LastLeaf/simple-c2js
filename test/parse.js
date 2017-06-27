@@ -147,7 +147,7 @@ describe('#parse', () => {
         struct A* a;
       };
       struct B {
-        struct A* b;
+        struct A b[010];
         int c;
         double d;
       };
@@ -178,7 +178,8 @@ describe('#parse', () => {
                 "struct": true,
                 "unsigned": false,
                 "name": "A",
-                "pointer": 1
+                "pointer": 1,
+                "count": 8
               },
               "name": "b"
             },

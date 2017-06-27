@@ -51,6 +51,12 @@ describe('#_compileContentOnly', () => {
     expect(compileContent(filename)).to.equal(target)
   })
 
+  it('should compile member operaters', () => {
+    var filename = __dirname + '/compile/member.c'
+    var target = 'function main(){var a=4096,b=8192,d=0,e=0;__I8__[(b|0+__im__((1),(~~floor(+(__F32__[(b|0+48+__im__((8),(3)))>>2<<2>>2])))))];d=__I32__[(b|0+68)>>2<<2>>2];e=~~floor(__F64__[(b|0+80)>>3<<3>>3]);return 0;}return{main:main}'
+    expect(compileContent(filename)).to.equal(target)
+  })
+
 })
 
 describe('#compile', () => {

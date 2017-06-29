@@ -1,6 +1,5 @@
 var fs = require('fs')
 var parseFile = require('./lib/parse-file')
-var convert = require('./lib/convert')
 var generate = require('./lib/generate')
 var link = require('./lib/link')
 
@@ -27,11 +26,11 @@ exports.parseFile = function(filename){
 }
 
 exports._compileContentOnly = function(filename){
-  return generate(convert(parseFile(parser, filename)), true)
+  return generate(parseFile(parser, filename), true)
 }
 
 exports.compile = function(filename){
-  return generate(convert(parseFile(parser, filename)))
+  return generate(parseFile(parser, filename))
 }
 
 exports.link = function(str){

@@ -17,13 +17,13 @@ describe('#_compileContentOnly', () => {
 
   it('should compile statics', () => {
     var filename = __dirname + '/compile/statics.c'
-    var target = 'var a=0;var b=1;var c=4;var d=0.0,d2=1.0;var e=__f__(-2.3);return{}'
+    var target = 'var A=0,B=1,C=4,D=0.0,E=1.0,F=__f__(-2.3);return{}'
     expect(compileContent(filename)).to.equal(target)
   })
 
   it('should compile empty functions', () => {
     var filename = __dirname + '/compile/function.c'
-    var target = 'function calc(){return 0;}function fn(f,i){f=__f__(f);i=i|0;return +((0)|0);}function main(argc,argv){argc=argc|0;argv=argv|0;return 0;}return{fn:fn,main:main}'
+    var target = 'function A(){return 0;}function B(A,B){A=__f__(A);B=B|0;return +(0|0);}function C(A,B){A=A|0;B=B|0;return 0;}return{fn:B,main:C}'
     expect(compileContent(filename)).to.equal(target)
   })
 

@@ -47,19 +47,19 @@ describe('#_compileContentOnly', () => {
 
   it('should compile for statements', () => {
     var filename = __dirname + '/compile/for.c'
-    var target = 'function main(){for(;;){}for(1;2;3){return ~~floor(4);}}return{main:main}'
+    var target = 'function A(){for(;;){}for(1;2;3){return ~~floor(4);}}return{main:A}'
     expect(compileContent(filename)).to.equal(target)
   })
 
   it('should compile member operaters', () => {
     var filename = __dirname + '/compile/member.c'
-    var target = 'function main(){var a=4096,b=8192,dInt=0,dDouble=0.0,dFloat=__f__(0),eInt=0,eDouble=0.0,eFloat=__f__(0),fInt=0,fDouble=0.0,fFloat=__f__(0);__I8__[(b|0+__im__((1),(~~floor(+(__F32__[(b|0+48+__im__((8),(3)))>>2<<2>>2])))))];dInt=(__I32__[(b|0+68)>>2<<2>>2])|0;dDouble=+((__I32__[(b|0+68)>>2<<2>>2])|0);dFloat=__f__((__I32__[(b|0+68)>>2<<2>>2])|0);eInt=~~floor(__F64__[(b|0+80)>>3<<3>>3]);eDouble=+(__F64__[(b|0+80)>>3<<3>>3]);eFloat=__f__(__F64__[(b|0+80)>>3<<3>>3]);fInt=~~floor(+(__F32__[(b|0+88)>>2<<2>>2]));fDouble=+(__F32__[(b|0+88)>>2<<2>>2]);fFloat=__f__(__F32__[(b|0+88)>>2<<2>>2]);return 0;}return{main:main}'
+    var target = 'function A(){var A=4096,B=8192,C=0,D=0.0,E=__f__(0),F=0,G=0.0,H=__f__(0),I=0,J=0.0,K=__f__(0);__C__[B+__m__(1,~~floor(+__F__[B+48+__m__(8,3)<<2>>2>>2]))<<0>>0>>0];C=__I__[B+68<<2>>2>>2]|0;D=+(__I__[B+68<<2>>2>>2]|0);E=__f__(__I__[B+68<<2>>2>>2]|0);F=~~floor(__D__[B+80<<3>>3>>3]);G=+__D__[B+80<<3>>3>>3];H=__f__(__D__[B+80<<3>>3>>3]);I=~~floor(+__F__[B+88<<2>>2>>2]);J=+__F__[B+88<<2>>2>>2];K=__f__(__F__[B+88<<2>>2>>2]);return 0;}return{main:A}'
     expect(compileContent(filename)).to.equal(target)
   })
 
   it('should compile assignment expressions', () => {
     var filename = __dirname + '/compile/assignment.c'
-    var target = ''
+    var target = 'function A(){var A=4096,B=0;__F__[A+4<<2>>2>>2]=__f__(1|0);B=~~floor(+__F__[A+4<<2>>2>>2]);__I__[A<<2>>2>>2]=B;return __I__[A<<2>>2>>2]|0;}return{main:A}'
     expect(compileContent(filename)).to.equal(target)
   })
 

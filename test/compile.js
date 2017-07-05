@@ -63,6 +63,12 @@ describe('#_compileContentOnly', () => {
     expect(compileContent(filename)).to.equal(target)
   })
 
+  it('should compile addition and multiplication expressions', () => {
+    var filename = __dirname + '/compile/addition.c'
+    var target = 'function A(){var A=1,B=0,C=0,D=0.0,E=__f__(0);B=(~~floor(+(__m__(A,2)|0)/+(3|0))+4|0)-5|0;C=~~floor(+(A|0)%+(B|0));D=+((B+6|0)-~~floor(+7)|0);E=__f__(D*+(B|0));return ~~floor(D*+(9|0)/+E);}return{main:A}'
+    expect(compileContent(filename)).to.equal(target)
+  })
+
 })
 
 describe('#compile', () => {

@@ -483,7 +483,7 @@ describe('#parse', () => {
   it('should parse common expressions', () => {
     var source = `
       int main() {
-        a == +1 % 0 - 2u / 0;
+        a == +1 % 0 - 2u / 0 - 123;
         b[3].child->point = 4.0 * -5.7L;
         (aaa) && a | f(b1, b2) & (~~c ^ !d);
         m ? n != p || q > s && t <= x : y << z;
@@ -496,8 +496,8 @@ describe('#parse', () => {
           "static": false,
           "type": {
             "struct": false,
-            "unsigned": false,
             "name": "int",
+            "unsigned": false,
             "pointer": 0
           },
           "name": "main",
@@ -510,47 +510,39 @@ describe('#parse', () => {
                 "name": "a"
               },
               "right": {
-                "op": "+-",
-                "body": [
-                  {
-                    "op": "*/%",
-                    "body": [
-                      {
-                        "op": "+n",
-                        "body": {
-                          "op": "int",
-                          "value": 1
-                        }
-                      },
-                      {
-                        "op": "%",
-                        "body": {
-                          "op": "int",
-                          "value": 0
-                        }
+                "op": "-",
+                "left": {
+                  "op": "-",
+                  "left": {
+                    "op": "%",
+                    "left": {
+                      "op": "+n",
+                      "body": {
+                        "op": "int",
+                        "value": 1
                       }
-                    ]
+                    },
+                    "right": {
+                      "op": "int",
+                      "value": 0
+                    }
                   },
-                  {
-                    "op": "-",
-                    "body": {
-                      "op": "*/%",
-                      "body": [
-                        {
-                          "op": "int",
-                          "value": 2
-                        },
-                        {
-                          "op": "/",
-                          "body": {
-                            "op": "int",
-                            "value": 0
-                          }
-                        }
-                      ]
+                  "right": {
+                    "op": "/",
+                    "left": {
+                      "op": "int",
+                      "value": 2
+                    },
+                    "right": {
+                      "op": "int",
+                      "value": 0
                     }
                   }
-                ]
+                },
+                "right": {
+                  "op": "int",
+                  "value": 123
+                }
               }
             },
             {
@@ -577,88 +569,75 @@ describe('#parse', () => {
                 ]
               },
               "right": {
-                "op": "*/%",
-                "body": [
-                  {
-                    "op": "float",
-                    "value": 4
-                  },
-                  {
-                    "op": "*",
-                    "body": {
-                      "op": "-n",
-                      "body": {
-                        "op": "double",
-                        "value": 5.7
-                      }
-                    }
+                "op": "*",
+                "left": {
+                  "op": "float",
+                  "value": 4
+                },
+                "right": {
+                  "op": "-n",
+                  "body": {
+                    "op": "double",
+                    "value": 5.7
                   }
-                ]
+                }
               }
             },
             {
               "op": "&&",
-              "body": [
-                {
-                  "op": "()",
-                  "body": {
-                    "op": "var",
-                    "name": "aaa"
-                  }
+              "left": {
+                "op": "()",
+                "body": {
+                  "op": "var",
+                  "name": "aaa"
+                }
+              },
+              "right": {
+                "op": "|",
+                "left": {
+                  "op": "var",
+                  "name": "a"
                 },
-                {
-                  "op": "|",
-                  "body": [
-                    {
-                      "op": "var",
-                      "name": "a"
-                    },
-                    {
-                      "op": "&",
-                      "body": [
-                        {
-                          "op": "f()",
-                          "args": [
-                            {
-                              "op": "var",
-                              "name": "b1"
-                            },
-                            {
-                              "op": "var",
-                              "name": "b2"
-                            }
-                          ]
-                        },
-                        {
-                          "op": "()",
+                "right": {
+                  "op": "&",
+                  "left": {
+                    "op": "f()",
+                    "args": [
+                      {
+                        "op": "var",
+                        "name": "b1"
+                      },
+                      {
+                        "op": "var",
+                        "name": "b2"
+                      }
+                    ]
+                  },
+                  "right": {
+                    "op": "()",
+                    "body": {
+                      "op": "^",
+                      "left": {
+                        "op": "~n",
+                        "body": {
+                          "op": "~n",
                           "body": {
-                            "op": "^",
-                            "body": [
-                              {
-                                "op": "~n",
-                                "body": {
-                                  "op": "~n",
-                                  "body": {
-                                    "op": "var",
-                                    "name": "c"
-                                  }
-                                }
-                              },
-                              {
-                                "op": "!n",
-                                "body": {
-                                  "op": "var",
-                                  "name": "d"
-                                }
-                              }
-                            ]
+                            "op": "var",
+                            "name": "c"
                           }
                         }
-                      ]
+                      },
+                      "right": {
+                        "op": "!n",
+                        "body": {
+                          "op": "var",
+                          "name": "d"
+                        }
+                      }
                     }
-                  ]
+                  }
                 }
-              ]
+              }
             },
             {
               "op": "?:",
@@ -668,46 +647,42 @@ describe('#parse', () => {
               },
               "body": {
                 "op": "||",
-                "body": [
-                  {
-                    "op": "!=",
+                "left": {
+                  "op": "!=",
+                  "left": {
+                    "op": "var",
+                    "name": "n"
+                  },
+                  "right": {
+                    "op": "var",
+                    "name": "p"
+                  }
+                },
+                "right": {
+                  "op": "&&",
+                  "left": {
+                    "op": ">null",
                     "left": {
                       "op": "var",
-                      "name": "n"
+                      "name": "q"
                     },
                     "right": {
                       "op": "var",
-                      "name": "p"
+                      "name": "s"
                     }
                   },
-                  {
-                    "op": "&&",
-                    "body": [
-                      {
-                        "op": ">null",
-                        "left": {
-                          "op": "var",
-                          "name": "q"
-                        },
-                        "right": {
-                          "op": "var",
-                          "name": "s"
-                        }
-                      },
-                      {
-                        "op": "<=",
-                        "left": {
-                          "op": "var",
-                          "name": "t"
-                        },
-                        "right": {
-                          "op": "var",
-                          "name": "x"
-                        }
-                      }
-                    ]
+                  "right": {
+                    "op": "<=",
+                    "left": {
+                      "op": "var",
+                      "name": "t"
+                    },
+                    "right": {
+                      "op": "var",
+                      "name": "x"
+                    }
                   }
-                ]
+                }
               },
               "elseBody": {
                 "op": "<<",

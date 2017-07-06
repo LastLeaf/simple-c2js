@@ -23,7 +23,7 @@ describe('#_compileContentOnly', () => {
 
   it('should compile empty functions', () => {
     var filename = __dirname + '/compile/function.c'
-    var target = 'function A(){return 0;}function B(A,B){A=__f__(A);B=B|0;return +(0|0);}function C(A,B){A=A|0;B=B|0;return 0;}return{fn:B,main:C}'
+    var target = 'function A(){return 0;}function B(A,B){A=__f__(A);B=B|0;return +0;}function C(A,B){A=A|0;B=B|0;return 0;}return{fn:B,main:C}'
     expect(compileContent(filename)).to.equal(target)
   })
 
@@ -35,37 +35,37 @@ describe('#_compileContentOnly', () => {
 
   it('should compile if statements', () => {
     var filename = __dirname + '/compile/if.c'
-    var target = 'function A(){if(1)2;if(3){return 4;}else if(5){return 6;}else {return 7;}}return{main:A}'
+    var target = 'function A(){if(~~floor(1.0))2;if(~~floor(+__f__(3))){return 4;}else if(5){return 6;}else {return 7;}return 0;}return{main:A}'
     expect(compileContent(filename)).to.equal(target)
   })
 
   it('should compile while statements', () => {
     var filename = __dirname + '/compile/while.c'
-    var target = 'function A(){while(1)2;while(3){return 4;}}return{main:A}'
+    var target = 'function A(){while(~~floor(1.0))2;while(~~floor(+__f__(3))){return 4;}return 0;}return{main:A}'
     expect(compileContent(filename)).to.equal(target)
   })
 
   it('should compile for statements', () => {
     var filename = __dirname + '/compile/for.c'
-    var target = 'function A(){for(;;){}for(1;2;3){return ~~floor(4);}}return{main:A}'
+    var target = 'function A(){for(;;){}for(1;2;3){return ~~floor(4.0);}return 0;}return{main:A}'
     expect(compileContent(filename)).to.equal(target)
   })
 
   it('should compile member operaters', () => {
     var filename = __dirname + '/compile/member.c'
-    var target = 'function A(){var A=4096,B=8192,C=0,D=0.0,E=__f__(0),F=0,G=0.0,H=__f__(0),I=0,J=0.0,K=__f__(0);__C__[B+__m__(1,~~floor(+__F__[B+48+__m__(8,3)<<2>>2>>2]))<<0>>0>>0];C=__I__[B+68<<2>>2>>2]|0;D=+(__I__[B+68<<2>>2>>2]|0);E=__f__(__I__[B+68<<2>>2>>2]|0);F=~~floor(__D__[B+80<<3>>3>>3]);G=+__D__[B+80<<3>>3>>3];H=__f__(__D__[B+80<<3>>3>>3]);I=~~floor(+__F__[B+88<<2>>2>>2]);J=+__F__[B+88<<2>>2>>2];K=__f__(__F__[B+88<<2>>2>>2]);return 0;}return{main:A}'
+    var target = 'function A(){var A=4096,B=8192,C=0,D=0.0,E=__f__(0),F=0,G=0.0,H=__f__(0),I=0,J=0.0,K=__f__(0);__C__[B+__m__(1,~~floor(+__F__[B+48+__m__(8,3)<<2>>2>>2]))<<0>>0>>0];C=__I__[B+68<<2>>2>>2]|0;D=+(__I__[B+68<<2>>2>>2]|0);E=__f__(__I__[B+68<<2>>2>>2]|0);F=~~floor(+__D__[B+80<<3>>3>>3]);G=+__D__[B+80<<3>>3>>3];H=__f__(__D__[B+80<<3>>3>>3]);I=~~floor(+__F__[B+88<<2>>2>>2]);J=+__F__[B+88<<2>>2>>2];K=__f__(__F__[B+88<<2>>2>>2]);return 0;}return{main:A}'
     expect(compileContent(filename)).to.equal(target)
   })
 
   it('should compile assignment expressions', () => {
     var filename = __dirname + '/compile/assignment.c'
-    var target = 'function A(){var A=4096,B=0;__F__[A+4<<2>>2>>2]=__f__(1|0);B=~~floor(+__F__[A+4<<2>>2>>2]);__I__[A<<2>>2>>2]=B;return __I__[A<<2>>2>>2]|0;}return{main:A}'
+    var target = 'function A(){var A=4096,B=0;__F__[A+4<<2>>2>>2]=__f__(1);B=~~floor(+__F__[A+4<<2>>2>>2]);__I__[A<<2>>2>>2]=B;return __I__[A<<2>>2>>2]|0;}return{main:A}'
     expect(compileContent(filename)).to.equal(target)
   })
 
   it('should compile addition and multiplication expressions', () => {
     var filename = __dirname + '/compile/addition.c'
-    var target = 'function A(){var A=1,B=0,C=0,D=0.0,E=__f__(0);B=(~~floor(+(__m__(A,2)|0)/+(3|0))+4|0)-5|0;C=~~floor(+(A|0)%+(B|0));D=+((B+6|0)-~~floor(+7)|0);E=__f__(D*+(B|0));return ~~floor(D*+(9|0)/+E);}return{main:A}'
+    var target = 'function A(){var A=1,B=0,C=0,D=0.0,E=__f__(0),F=4096;B=~~floor(+(+~~floor(+__m__(A,2)/+3)+4.0-+5));C=~~floor(+(A|0)%+(B|0));D=+(B+6-~~floor(+__f__(7))|0);E=__f__(+D*+(B|0));F=F+__m__(~~floor(+8*+D),8)|0;return ~~floor(+D*+9/+E);}return{main:A}'
     expect(compileContent(filename)).to.equal(target)
   })
 

@@ -3,4 +3,5 @@ int main() {
   while(3.0) {
     return 4;
   }
+  return 0;
 }

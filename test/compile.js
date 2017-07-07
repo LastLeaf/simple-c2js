@@ -23,7 +23,7 @@ describe('#_compileContentOnly', () => {
 
   it('should compile empty functions', () => {
     var filename = __dirname + '/compile/function.c'
-    var target = 'function A(){return 0;}function B(A,B){A=__f__(A);B=B|0;return +0;}function C(A,B){A=A|0;B=B|0;return 0;}return{fn:B,main:C}'
+    var target = 'function _A(){return 0;}function _B(A,B){A=__f(A);B=B|0;return +0;}function _C(A,B){A=A|0;B=B|0;var C=0;C=~~__l(+_B(__f(1),~~__l(2.0)));return C|0;}return{fn:_B,main:_C}'
     expect(compileContent(filename)).to.equal(target)
   })
 
@@ -75,7 +75,7 @@ describe('#compile', () => {
 
   it('should wrap with proper wrapper', () => {
     var filename = __dirname + '/compile/empty.c'
-    var target = 'function asmModule(__stdlib__,__foreign__,__heap__){"use asm";var __B__=new __stdlib__.Uint8Array(__heap__);var __C__=new __stdlib__.Int8Array(__heap__);var __U__=new __stdlib__.Uint32Array(__heap__);var __I__=new __stdlib__.Int32Array(__heap__);var __F__=new __stdlib__.Float32Array(__heap__);var __D__=new __stdlib__.Float64Array(__heap__);var __m__=__stdlib__.Math.imul;var __f__=__stdlib__.Math.fround;var acos=__stdlib__.Math.acos;var asin=__stdlib__.Math.asin;var atan=__stdlib__.Math.atan;var cos=__stdlib__.Math.cos;var sin=__stdlib__.Math.sin;var tan=__stdlib__.Math.tan;var exp=__stdlib__.Math.exp;var log=__stdlib__.Math.log;var ceil=__stdlib__.Math.ceil;var floor=__stdlib__.Math.floor;var sqrt=__stdlib__.Math.sqrt;var abs=__stdlib__.Math.abs;var fabs=__stdlib__.Math.abs;var atan2=__stdlib__.Math.atan2;var pow=__stdlib__.Math.pow;var M_E=__stdlib__.Math.E;var M_LN10=__stdlib__.Math.LN10;var M_LN2=__stdlib__.Math.LN2;var M_LOG2E=__stdlib__.Math.LOG2E;var M_LOG10E=__stdlib__.Math.LOG10E;var M_PI=__stdlib__.Math.PI;var M_SQRT1_2=__stdlib__.Math.SQRT1_2;var M_SQRT2=__stdlib__.Math.SQRT2;var INFINITY=__stdlib__.Infinity;var NAN=__stdlib__.NaN;return{}}'
+    var target = 'function asmModule(__stdlib,__foreign,__heap){"use asm";var __B=new __stdlib.Uint8Array(__heap);var __C=new __stdlib.Int8Array(__heap);var __U=new __stdlib.Uint32Array(__heap);var __I=new __stdlib.Int32Array(__heap);var __F=new __stdlib.Float32Array(__heap);var __D=new __stdlib.Float64Array(__heap);var __m=__stdlib.Math.imul;var __f=__stdlib.Math.fround;var __l=__stdlib.Math.floor;var __acos=__stdlib.Math.acos;var __asin=__stdlib.Math.asin;var __atan=__stdlib.Math.atan;var __cos=__stdlib.Math.cos;var __sin=__stdlib.Math.sin;var __tan=__stdlib.Math.tan;var __exp=__stdlib.Math.exp;var __log=__stdlib.Math.log;var __ceil=__stdlib.Math.ceil;var __floor=__stdlib.Math.floor;var __sqrt=__stdlib.Math.sqrt;var __abs=__stdlib.Math.abs;var __fabs=__stdlib.Math.abs;var __atan2=__stdlib.Math.atan2;var __pow=__stdlib.Math.pow;var __M_E=__stdlib.Math.E;var __M_LN10=__stdlib.Math.LN10;var __M_LN2=__stdlib.Math.LN2;var __M_LOG2E=__stdlib.Math.LOG2E;var __M_LOG10E=__stdlib.Math.LOG10E;var __M_PI=__stdlib.Math.PI;var __M_SQRT1_2=__stdlib.Math.SQRT1_2;var __M_SQRT2=__stdlib.Math.SQRT2;var __INFINITY=__stdlib.Infinity;var __NAN=__stdlib.NaN;return{}}'
     expect(c2js.compile(filename)).to.equal(target)
   })
 

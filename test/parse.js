@@ -602,6 +602,7 @@ describe('#parse', () => {
                   "op": "&",
                   "left": {
                     "op": "f()",
+                    "name": "f",
                     "args": [
                       {
                         "op": "var",

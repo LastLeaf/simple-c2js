@@ -69,6 +69,12 @@ describe('#_compileContentOnly', () => {
     expect(compileContent(filename)).to.equal(target)
   })
 
+  it('should compile addition and multiplication expressions', () => {
+    var filename = __dirname + '/compile/unary.c'
+    var target = 'function _A(){var A=-2,B=0,C=0;B=A+(-~4660|0)|0;C=(-B|0)+!10|0;return 8;}return{main:_A}'
+    expect(compileContent(filename)).to.equal(target)
+  })
+
 })
 
 describe('#compile', () => {

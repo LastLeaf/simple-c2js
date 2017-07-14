@@ -69,9 +69,15 @@ describe('#_compileContentOnly', () => {
     expect(compileContent(filename)).to.equal(target)
   })
 
-  it('should compile addition and multiplication expressions', () => {
+  it('should compile unary expressions', () => {
     var filename = __dirname + '/compile/unary.c'
     var target = 'function _A(){var A=-2,B=0,C=0;B=A+(-~4660|0)|0;C=(-B|0)+!10|0;return ~~8;}return{main:_A}'
+    expect(compileContent(filename)).to.equal(target)
+  })
+
+  it('should compile shift expressions', () => {
+    var filename = __dirname + '/compile/shift.c'
+    var target = 'function _A(){var A=1,B=0;B=4660<<2;A=A>>>1>>>0;A=B>>A;return ~~A;}return{main:_A}'
     expect(compileContent(filename)).to.equal(target)
   })
 

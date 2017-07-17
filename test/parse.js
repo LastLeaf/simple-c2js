@@ -662,7 +662,7 @@ describe('#parse', () => {
                 "right": {
                   "op": "&&",
                   "left": {
-                    "op": ">null",
+                    "op": ">",
                     "left": {
                       "op": "var",
                       "name": "q"

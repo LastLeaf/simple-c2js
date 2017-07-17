@@ -81,6 +81,12 @@ describe('#_compileContentOnly', () => {
     expect(compileContent(filename)).to.equal(target)
   })
 
+  it('should compile relational expressions', () => {
+    var filename = __dirname + '/compile/relation.c'
+    var target = 'function _A(){var A=1,B=2.0,C=__f(3),D=0;D=(+(A|0)>B|0)==(B<+C|0);return ~~(((D|0)<=(A|0)|0)!=((A|0)>=(~~+C|0)|0));}return{main:_A}'
+    expect(compileContent(filename)).to.equal(target)
+  })
+
 })
 
 describe('#compile', () => {

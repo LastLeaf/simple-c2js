@@ -87,6 +87,12 @@ describe('#_compileContentOnly', () => {
     expect(compileContent(filename)).to.equal(target)
   })
 
+  it('should compile logical expressions', () => {
+    var filename = __dirname + '/compile/logic.c'
+    var target = 'function _A(){var A=1,B=2.0,C=__f(3),D=0;D=1&(A|1&(~~B|~~+C));return ~~(~~+C&A|~~B^D);}return{main:_A}'
+    expect(compileContent(filename)).to.equal(target)
+  })
+
 })
 
 describe('#compile', () => {

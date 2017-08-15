@@ -2,8 +2,11 @@
   "name": "simple-c2js",
   "version": "0.1.0",
   "description": "Simple C-like syntax to asm.js converter",
+  "repository": "https://github.com/LastLeaf/simple-c2js",
   "main": "index.js",
   "scripts": {
+    "build": "node build.js",
+    "install": "node build.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "LastLeaf <bqfu@163.com>",

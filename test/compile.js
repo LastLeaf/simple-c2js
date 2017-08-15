@@ -21,9 +21,9 @@ describe('#_compileContentOnly', () => {
     expect(compileContent(filename)).to.equal(target)
   })
 
-  it('should compile empty functions', () => {
+  it('should compile function calls', () => {
     var filename = __dirname + '/compile/function.c'
-    var target = 'function _A(){return 0;}function _B(A,B){A=__f(A);B=B|0;return +(0|0);}function _C(A,B){A=A|0;B=B|0;var C=0;C=~~+_B(__f(1),~~2.0);return ~~C;}return{fn:_B,main:_C}'
+    var target = 'function _A(){return 0;}function _B(A,B){A=__f(A);B=B|0;return +(0|0);}function _C(A,B){A=A|0;B=B|0;var C=0,D=0;C=~~+_B(__f(1),~~2.0);D=~~+__pow(+(C|0),+__sqrt(__M_PI));return ~~C;}return{fn:_B,main:_C}'
     expect(compileContent(filename)).to.equal(target)
   })
 
